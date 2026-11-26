@@ -1,6 +1,8 @@
 # crucibo
 
-[![CI](https://github.com/sweet-little-adder/crucibo/actions/workflows/ci.yml/badge.svg)](https://github.com/sweet-little-adder/crucibo/actions/workflows/ci.yml)
+> GitHub repository: `morning-star` (renamed from `crucibo` on 2026-11-26). The Python package and CLI are still named `crucibo`. The training system is now the GitHub repository `crucibo`, whose package and CLI are still named `morning-star`.
+
+[![CI](https://github.com/sweet-little-adder/morning-star/actions/workflows/ci.yml/badge.svg)](https://github.com/sweet-little-adder/morning-star/actions/workflows/ci.yml)
 
 **US equities trading infrastructure** — ingest, backtest, paper, and live on one path (crypto optional).
 
@@ -43,7 +45,7 @@ Legacy commands (`replay-parquet`, `alphavantage-daily`, paper trading, etc.) st
 | **Proof** | pytest + ruff; replay verified on real AAPL daily bars. |
 
 ```bash
-git clone https://github.com/sweet-little-adder/crucibo.git && cd crucibo
+git clone https://github.com/sweet-little-adder/morning-star.git && cd morning-star
 python3 -m venv .venv && .venv/bin/pip install -e ".[dev]"
 cp .env.example .env   # add ALPHA_VANTAGE_API_KEY
 set -a && source .env && set +a
