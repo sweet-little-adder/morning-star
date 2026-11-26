@@ -18,7 +18,7 @@ from crucibo.io_parquet import news_to_parquet
 from crucibo.models import NewsEvent, utc_now_ns
 from crucibo.news.feeds import get_feed
 
-USER_AGENT = "crucibo/0.1 (+https://github.com/sweet-little-adder/crucibo; research ingest)"
+USER_AGENT = "crucibo/0.1 (+https://github.com/sweet-little-adder/morning-star; research ingest)"
 
 
 def struct_time_to_ns(st: struct_time) -> int:
