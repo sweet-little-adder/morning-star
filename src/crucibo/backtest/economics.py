@@ -14,6 +14,7 @@ class EconomicsConfig:
     slippage_bps: float = 2.0
     latency_bars: int = 0
     max_position_shares: int | None = None
+    clamp_buys_to_cash: bool = False  # buy as many shares as cash allows instead of raising
 
     def __post_init__(self) -> None:
         if self.initial_cash <= 0:

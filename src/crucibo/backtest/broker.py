@@ -67,6 +67,11 @@ class SimBroker:
         if delta > 0:
             side = "BUY"
             px = exec_price * slip_multiplier(side=side, slip_bps=self._cfg.slippage_bps)
+            if self._cfg.clamp_buys_to_cash:
+                per_share = px * (1.0 + self._cfg.fee_bps / 10_000.0)
+                delta = min(delta, int(self._portfolio.cash // per_share))
+                if delta <= 0:
+                    return None
             gross = delta * px
             fee = fee_cash(notional=gross, fee_bps=self._cfg.fee_bps)
             total = gross + fee
