@@ -4,13 +4,14 @@ from __future__ import annotations
 
 from pathlib import Path
 
-from crucibo.aapl_mlp_v1.loader import AaplMlpV1Model, load_aapl_mlp_v1_model
+from crucibo.aapl_mlp_v1.extra_models import LinearV1Model, TreesV1Model
+from crucibo.aapl_mlp_v1.loader import AaplMlpV1Model, load_artifact_model
 from crucibo.features import FeatureState
 from crucibo.models import TradeTick
 
 
 class AaplMlpV1Strategy:
-    def __init__(self, model: AaplMlpV1Model) -> None:
+    def __init__(self, model: AaplMlpV1Model | LinearV1Model | TreesV1Model) -> None:
         self._model = model
         self._state = FeatureState(
             lookback=model.lookback,
@@ -20,7 +21,7 @@ class AaplMlpV1Strategy:
 
     @classmethod
     def from_artifact(cls, path: Path) -> AaplMlpV1Strategy:
-        return cls(load_aapl_mlp_v1_model(path))
+        return cls(load_artifact_model(path))
 
     def desired_shares(
         self,

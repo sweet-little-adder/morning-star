@@ -9,10 +9,13 @@ from pathlib import Path
 
 import numpy as np
 
+from crucibo.aapl_mlp_v1.extra_models import LinearV1Model, TreesV1Model
 from crucibo.features import FEATURE_NAMES, FEATURE_SCHEMA_VERSION
 
 CONTRACT_VERSION = 1
 MODEL_TYPE_MLP_V1 = "mlp_v1"
+MODEL_TYPE_LINEAR_V1 = "linear_v1"
+MODEL_TYPE_TREES_V1 = "trees_v1"
 MANIFEST_FILENAME = "manifest.json"
 WEIGHTS_FILENAME = "weights.npz"
 
@@ -85,4 +88,57 @@ def load_aapl_mlp_v1_model(path: Path) -> AaplMlpV1Model:
             threshold=float(manifest["threshold"]),
             target_shares=int(manifest["target_shares"]),
             initial_cash=float(manifest["initial_cash"]),
+        )
+
+
+def load_artifact_model(path: Path) -> AaplMlpV1Model | LinearV1Model | TreesV1Model:
+    """Load any supported artifact. mlp_v1 behaves exactly as load_aapl_mlp_v1_model."""
+    artifact_dir = resolve_artifact_dir(path)
+    manifest_path = artifact_dir / MANIFEST_FILENAME
+    if not manifest_path.is_file():
+        raise ValueError(f"missing {MANIFEST_FILENAME} in {artifact_dir}")
+    manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+    mtype = manifest.get("model_type")
+    if mtype == MODEL_TYPE_MLP_V1:
+        return load_aapl_mlp_v1_model(artifact_dir)
+    if mtype not in (MODEL_TYPE_LINEAR_V1, MODEL_TYPE_TREES_V1):
+        raise ValueError(f"unsupported artifact model_type: {mtype!r}")
+    if int(manifest.get("contract_version", -1)) != CONTRACT_VERSION:
+        raise ValueError(f"unsupported contract_version in {manifest_path}")
+    if int(manifest.get("feature_schema_version", -1)) != FEATURE_SCHEMA_VERSION:
+        raise ValueError("unsupported feature_schema_version")
+    if tuple(manifest.get("feature_names", ())) != FEATURE_NAMES:
+        raise ValueError("feature_names mismatch with crucibo feature schema v1")
+    indices = tuple(int(i) for i in manifest["feature_indices"])
+    if any(i < 0 or i >= len(FEATURE_NAMES) for i in indices):
+        raise ValueError("feature_indices out of range")
+    common = dict(
+        feature_indices=indices,
+        lookback=int(manifest["lookback"]),
+        forward_horizon=int(manifest["forward_horizon"]),
+        threshold=float(manifest["threshold"]),
+        target_shares=int(manifest["target_shares"]),
+        initial_cash=float(manifest["initial_cash"]),
+    )
+    weights_file = artifact_dir / WEIGHTS_FILENAME
+    if not weights_file.is_file():
+        raise ValueError(f"missing {WEIGHTS_FILENAME} in {artifact_dir}")
+    with np.load(weights_file, allow_pickle=False) as z:
+        if mtype == MODEL_TYPE_LINEAR_V1:
+            link = str(manifest["link"])
+            if link not in ("sigmoid", "identity"):
+                raise ValueError(f"unsupported link {link!r}")
+            return LinearV1Model(
+                mu=z["mu"], sd=z["sd"], w=z["w"], b=float(z["b"]), link=link, **common
+            )
+        return TreesV1Model(
+            tree_offsets=z["tree_offsets"],
+            left=z["left"],
+            right=z["right"],
+            feature=z["feature"],
+            split=z["split"],
+            value=z["value"],
+            default_left=z["default_left"],
+            base_margin=float(z["base_margin"]),
+            **common,
         )
