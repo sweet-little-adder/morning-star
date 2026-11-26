@@ -1,0 +1,23 @@
+{
+  "contract_version": 1,
+  "producer": "morning-star",
+  "model_type": "mlp_v1",
+  "feature_schema_version": 1,
+  "feature_names": [
+    "ret_1",
+    "mean_ret",
+    "price_z",
+    "position_norm",
+    "cash_norm"
+  ],
+  "lookback": 20,
+  "forward_horizon": 5,
+  "threshold": 0.5,
+  "target_shares": 10,
+  "initial_cash": 1000000.0,
+  "hidden_dim": 8,
+  "action_type": "target_shares",
+  "training_ticks_path": "synthetic",
+  "training_tick_count": 450,
+  "training_symbol": "SYNTH"
+}
