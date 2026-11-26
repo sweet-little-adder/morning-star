@@ -1,0 +1,25 @@
+{
+  "contract_version": 1,
+  "producer": "morning-star",
+  "model_type": "linear_v1",
+  "feature_schema_version": 1,
+  "feature_names": [
+    "ret_1",
+    "mean_ret",
+    "price_z",
+    "position_norm",
+    "cash_norm"
+  ],
+  "feature_indices": [
+    0,
+    1,
+    2
+  ],
+  "lookback": 20,
+  "forward_horizon": 5,
+  "threshold": 0.5,
+  "target_shares": 100,
+  "initial_cash": 1000000.0,
+  "action_type": "target_shares",
+  "link": "sigmoid"
+}
